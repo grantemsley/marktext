@@ -135,6 +135,7 @@
       "typewriterMode": "Typewriter Mode",
       "focus": "Focus Mode",
       "focusMode": "Focus Mode",
+      "readingMode": "Reading Mode",
       "showTabBar": "Show Tab Bar",
       "toc": "Table of Contents",
       "toggleTableOfContents": "Toggle Table of Contents",
@@ -1000,6 +1001,7 @@
       "sourceCodeMode": "Source Code Mode",
       "typewriterMode": "Typewriter Mode",
       "focusMode": "Focus Mode",
+      "readingMode": "Reading Mode",
       "toggleSourceCodeMode": "Toggle Source Code Mode",
       "toggleTypewriterMode": "Toggle Typewriter Mode",
       "toggleFocusMode": "Toggle Focus Mode",
@@ -1112,7 +1114,8 @@
       "exportSuccessTitle": "Exported successfully",
       "exportSuccessMessage": "Exported \"{name}\" successfully!",
       "fileRemovedOnDisk": "\"{name}\" has been removed on disk.",
-      "fileChangedOnDisk": "\"{name}\" has been changed on disk. Do you want to reload it?"
+      "fileChangedOnDisk": "\"{name}\" has been changed on disk. Do you want to reload it?",
+      "fileReloadedFromDisk": "\"{name}\" has been reloaded from disk."
     }
   },
   "spellchecker": {

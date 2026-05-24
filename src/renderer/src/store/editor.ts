@@ -59,6 +59,7 @@ interface PushTabNotificationPayload {
   style?: string
   exclusiveType?: string
   action?: FileNotification['action']
+  timeout?: number
 }
 
 interface FileChangePayload {
@@ -283,7 +284,8 @@ export const useEditorStore = defineStore('editor', {
         showConfirm,
         style,
         exclusiveType,
-        action
+        action,
+        timeout: data.timeout
       })
     },
 
@@ -1592,7 +1594,23 @@ export const useEditorStore = defineStore('editor', {
             }
             case 'add':
             case 'change': {
-              const { autoSave } = preferencesStore
+              const { autoSave, readingMode } = preferencesStore
+
+              // Reading mode: auto-reload regardless of saved state and show an
+              // auto-dismissing notification.
+              if (readingMode) {
+                this.loadChange(change as unknown as FileChangePayload)
+                this.pushTabNotification({
+                  tabId: id,
+                  msg: t('store.editor.fileReloadedFromDisk', { name: filename }),
+                  showConfirm: false,
+                  exclusiveType: 'file_changed',
+                  timeout: 3000
+                })
+                debouncedSendBufferedState()
+                return
+              }
+
               if (autoSave) {
                 if (autoSaveTimers.has(id)) {
                   const timer = autoSaveTimers.get(id)

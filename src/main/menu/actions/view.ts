@@ -6,6 +6,7 @@ type Win = BrowserWindow | null | undefined
 
 const typewriterModeMenuItemId = 'typewriterModeMenuItem'
 const focusModeMenuItemId = 'focusModeMenuItem'
+const readingModeMenuItemId = 'readingModeMenuItem'
 
 const toggleTypeMode = (win: Win, type: string): void => {
   if (win && win.webContents) {
@@ -71,6 +72,10 @@ export const toggleTypewriterMode = (win: Win): void => {
   toggleTypeMode(win, 'typewriter')
 }
 
+export const toggleReadingMode = (win: Win): void => {
+  toggleTypeMode(win, 'readingMode')
+}
+
 export const reloadImageCache = (win: Win): void => {
   if (win && win.webContents) {
     win.webContents.send('mt::invalidate-image-cache')
@@ -88,6 +93,7 @@ export const loadViewCommands = (commandManager: CommandManager): void => {
   commandManager.add(COMMANDS.VIEW_TOGGLE_TABBAR, toggleTabBar)
   commandManager.add(COMMANDS.VIEW_TOGGLE_TOC, showTableOfContents)
   commandManager.add(COMMANDS.VIEW_TYPEWRITER_MODE, toggleTypewriterMode)
+  commandManager.add(COMMANDS.VIEW_READING_MODE, toggleReadingMode)
 
   commandManager.add(COMMANDS.VIEW_DEV_RELOAD, debugReloadWindow)
   commandManager.add(COMMANDS.VIEW_TOGGLE_DEV_TOOLS, debugToggleDevTools)
@@ -135,6 +141,9 @@ export const viewLayoutChanged = (
         break
       case 'focus':
         changeMenuByName(focusModeMenuItemId, value)
+        break
+      case 'readingMode':
+        changeMenuByName(readingModeMenuItemId, value)
         break
     }
   }

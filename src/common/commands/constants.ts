@@ -100,6 +100,7 @@ const COMMANDS = Object.freeze({
   VIEW_TOGGLE_TABBAR: 'view.toggle-tabbar',
   VIEW_TOGGLE_TOC: 'view.toggle-toc',
   VIEW_TYPEWRITER_MODE: 'view.typewriter-mode',
+  VIEW_READING_MODE: 'view.reading-mode',
 
   WINDOW_MINIMIZE: 'window.minimize',
   WINDOW_TOGGLE_ALWAYS_ON_TOP: 'window.toggle-always-on-top',

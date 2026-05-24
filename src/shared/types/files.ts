@@ -100,6 +100,8 @@ export interface FileNotification {
   style: string
   exclusiveType: string
   action: (status?: unknown) => void
+  /** When set, the notification is auto-dismissed after this many milliseconds. */
+  timeout?: number
 }
 
 export type ITab = IFileState
