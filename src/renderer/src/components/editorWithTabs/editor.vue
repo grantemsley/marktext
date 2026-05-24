@@ -1446,7 +1446,7 @@ onBeforeUnmount(() => {
 }
 
 .editor-wrapper.reading {
-  box-shadow: inset 0 0 0 2px var(--themeColor60);
+  box-shadow: inset 3px 0 0 0 var(--themeColor60);
 }
 
 .editor-component {
