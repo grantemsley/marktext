@@ -53,4 +53,18 @@ test.describe('View modes', () => {
       timeout: 10000
     })
   })
+
+  test('Toggle reading mode adds and removes .reading on .editor-wrapper', async() => {
+    await clickMenuById(app, 'readingModeMenuItem')
+    await expect(page.locator('.editor-wrapper')).toHaveClass(/(^|\s)reading(\s|$)/)
+    await clickMenuById(app, 'readingModeMenuItem')
+    await page.waitForFunction(
+      () => {
+        const el = document.querySelector('.editor-wrapper')
+        return !el || !el.classList.contains('reading')
+      },
+      null,
+      { timeout: 5000 }
+    )
+  })
 })

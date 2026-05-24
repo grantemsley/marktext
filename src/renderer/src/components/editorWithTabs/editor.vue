@@ -1445,6 +1445,10 @@ onBeforeUnmount(() => {
   overflow: hidden;
 }
 
+.editor-wrapper.reading {
+  box-shadow: inset 0 0 0 2px var(--themeColor60);
+}
+
 .editor-component {
   height: 100%;
   overflow: auto;
