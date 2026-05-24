@@ -111,6 +111,7 @@ export interface PreferencesState {
   typewriter: boolean
   focus: boolean
   sourceCode: boolean
+  readingMode: boolean
 
   // ----- User config -----
   imageFolderPath: string
@@ -131,7 +132,7 @@ interface SetUserDataPayload {
 }
 
 interface ModeTogglePayload {
-  type: keyof PreferencesState | 'typewriter' | 'focus' | 'sourceCode'
+  type: keyof PreferencesState | 'typewriter' | 'focus' | 'sourceCode' | 'readingMode'
   checked: boolean
 }
 
@@ -224,6 +225,7 @@ export const usePreferencesStore = defineStore('preferences', {
     typewriter: false, // typewriter mode
     focus: false, // focus mode
     sourceCode: false, // source code mode
+    readingMode: false, // reading mode (read-only + auto-reload on disk change)
 
     // user configration
     imageFolderPath: '',

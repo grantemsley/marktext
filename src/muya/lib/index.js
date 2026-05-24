@@ -235,6 +235,7 @@ class Muya {
   }
 
   createTable(tableChecker) {
+    if (this.isReadOnly()) return
     return this.contentState.createTable(tableChecker)
   }
 
@@ -251,6 +252,19 @@ class Muya {
       container.classList.remove(CLASS_OR_ID.AG_FOCUS_MODE)
     }
     this.options.focusMode = bool
+  }
+
+  setReadOnly(bool) {
+    const { container } = this
+    container.setAttribute('contenteditable', !bool)
+    this.options.readOnly = !!bool
+    if (bool) {
+      this.hideAllFloatTools()
+    }
+  }
+
+  isReadOnly() {
+    return !!this.options.readOnly
   }
 
   setFont({ fontSize, lineHeight }) {
@@ -286,22 +300,27 @@ class Muya {
   }
 
   updateParagraph(type) {
+    if (this.isReadOnly()) return
     this.contentState.updateParagraph(type)
   }
 
   duplicate() {
+    if (this.isReadOnly()) return
     this.contentState.duplicate()
   }
 
   deleteParagraph() {
+    if (this.isReadOnly()) return
     this.contentState.deleteParagraph()
   }
 
   insertParagraph(location /* before or after */, text = '', outMost = false) {
+    if (this.isReadOnly()) return
     this.contentState.insertParagraph(location, text, outMost)
   }
 
   editTable(data) {
+    if (this.isReadOnly()) return
     this.contentState.editTable(data)
   }
 
@@ -330,10 +349,12 @@ class Muya {
   }
 
   format(type) {
+    if (this.isReadOnly()) return
     this.contentState.format(type)
   }
 
   insertImage(imageInfo) {
+    if (this.isReadOnly()) return
     this.contentState.insertImage(imageInfo)
   }
 
@@ -345,6 +366,7 @@ class Muya {
   }
 
   replace(value, opt) {
+    if (this.isReadOnly()) return this.contentState.searchMatches
     this.contentState.replace(value, opt)
     this.contentState.render(false)
     return this.contentState.searchMatches
@@ -374,6 +396,7 @@ class Muya {
   }
 
   undo() {
+    if (this.isReadOnly()) return
     this.contentState.history.undo()
 
     this.dispatchSelectionChange()
@@ -382,6 +405,7 @@ class Muya {
   }
 
   redo() {
+    if (this.isReadOnly()) return
     this.contentState.history.redo()
 
     this.dispatchSelectionChange()
@@ -478,6 +502,7 @@ class Muya {
    * @param {boolean} setCursor Shoud we update the editor cursor?
    */
   replaceWordInline(line, wordCursor, replacement, setCursor = false) {
+    if (this.isReadOnly()) return
     this.contentState.replaceWordInline(line, wordCursor, replacement, setCursor)
   }
 
@@ -493,6 +518,7 @@ class Muya {
    * @returns {boolean} True on success.
    */
   _replaceCurrentWordInlineUnsafe(word, replacement) {
+    if (this.isReadOnly()) return false
     // __MARKTEXT_PATCH__
     return this.contentState._replaceCurrentWordInlineUnsafe(word, replacement)
   }

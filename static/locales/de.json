@@ -135,6 +135,7 @@
       "typewriterMode": "Schreibmaschinen-Modus",
       "focus": "Fokus-Modus",
       "focusMode": "Fokus-Modus",
+      "readingMode": "Lesemodus",
       "showTabBar": "Tab-Leiste anzeigen",
       "toc": "Inhaltsverzeichnis",
       "toggleTableOfContents": "Inhaltsverzeichnis umschalten",
@@ -993,6 +994,7 @@
       "sourceCodeMode": "Quellcode-Modus",
       "typewriterMode": "Schreibmaschinen-Modus",
       "focusMode": "Fokus-Modus",
+      "readingMode": "Lesemodus",
       "toggleSourceCodeMode": "Quellcode-Modus umschalten",
       "toggleTypewriterMode": "Schreibmaschinen-Modus umschalten",
       "toggleFocusMode": "Fokus-Modus umschalten",
@@ -1105,7 +1107,8 @@
       "exportSuccessTitle": "Erfolgreich exportiert",
       "exportSuccessMessage": "„{name}“ wurde erfolgreich exportiert!",
       "fileRemovedOnDisk": "„{name}“ wurde auf dem Datenträger gelöscht.",
-      "fileChangedOnDisk": "„{name}“ wurde auf dem Datenträger geändert. Möchten Sie neu laden?"
+      "fileChangedOnDisk": "„{name}“ wurde auf dem Datenträger geändert. Möchten Sie neu laden?",
+      "fileReloadedFromDisk": "„{name}“ wurde von der Festplatte neu geladen."
     }
   },
   "spellchecker": {

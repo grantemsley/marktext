@@ -46,6 +46,16 @@ export default function(keybindings: Keybindings): MenuItemConstructorOptions {
       }
     },
     {
+      id: 'readingModeMenuItem',
+      label: t('menu.view.readingMode'),
+      accelerator: keybindings.getAccelerator('view.reading-mode') ?? undefined,
+      type: 'checkbox',
+      checked: false,
+      click(_item, focusedWindow) {
+        actions.toggleReadingMode(focusedWindow as BrowserWindow | undefined)
+      }
+    },
+    {
       type: 'separator'
     },
     {

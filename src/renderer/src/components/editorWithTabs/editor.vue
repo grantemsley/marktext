@@ -1,7 +1,7 @@
 <template>
   <div
     class="editor-wrapper"
-    :class="[{ typewriter: typewriter, focus: focus, source: sourceCode }]"
+    :class="[{ typewriter: typewriter, focus: focus, source: sourceCode, reading: readingMode }]"
     :style="{
       lineHeight: lineHeight,
       fontSize: `${fontSize}px`,
@@ -187,7 +187,8 @@ const {
   // Edit modes
   typewriter,
   focus,
-  sourceCode
+  sourceCode,
+  readingMode
 } = storeToRefs(preferencesStore)
 
 // Editor store refs
@@ -309,6 +310,12 @@ watch(typewriter, (value) => {
 watch(focus, (value) => {
   if (editor.value) {
     editor.value.setFocusMode(value)
+  }
+})
+
+watch(readingMode, (value) => {
+  if (editor.value) {
+    editor.value.setReadOnly(value)
   }
 })
 
@@ -1208,6 +1215,10 @@ onMounted(() => {
 
   editor.value = new Muya(ele, options)
 
+  if (readingMode.value) {
+    editor.value.setReadOnly(true)
+  }
+
   const { container } = editor.value
 
   // Listen for language changes and update Muya's translation function
@@ -1432,6 +1443,10 @@ onBeforeUnmount(() => {
   top: 0;
   left: 0;
   overflow: hidden;
+}
+
+.editor-wrapper.reading {
+  box-shadow: inset 3px 0 0 0 var(--themeColor60);
 }
 
 .editor-component {

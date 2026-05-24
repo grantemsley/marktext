@@ -6,6 +6,7 @@ type Win = BrowserWindow | null | undefined
 
 const typewriterModeMenuItemId = 'typewriterModeMenuItem'
 const focusModeMenuItemId = 'focusModeMenuItem'
+const readingModeMenuItemId = 'readingModeMenuItem'
 
 const toggleTypeMode = (win: Win, type: string): void => {
   if (win && win.webContents) {
@@ -71,6 +72,10 @@ export const toggleTypewriterMode = (win: Win): void => {
   toggleTypeMode(win, 'typewriter')
 }
 
+export const toggleReadingMode = (win: Win): void => {
+  toggleTypeMode(win, 'readingMode')
+}
+
 export const reloadImageCache = (win: Win): void => {
   if (win && win.webContents) {
     win.webContents.send('mt::invalidate-image-cache')
@@ -88,6 +93,7 @@ export const loadViewCommands = (commandManager: CommandManager): void => {
   commandManager.add(COMMANDS.VIEW_TOGGLE_TABBAR, toggleTabBar)
   commandManager.add(COMMANDS.VIEW_TOGGLE_TOC, showTableOfContents)
   commandManager.add(COMMANDS.VIEW_TYPEWRITER_MODE, toggleTypewriterMode)
+  commandManager.add(COMMANDS.VIEW_READING_MODE, toggleReadingMode)
 
   commandManager.add(COMMANDS.VIEW_DEV_RELOAD, debugReloadWindow)
   commandManager.add(COMMANDS.VIEW_TOGGLE_DEV_TOOLS, debugToggleDevTools)
@@ -129,12 +135,23 @@ export const viewLayoutChanged = (
         changeMenuByName('sourceCodeModeMenuItem', !!value)
         disableMenuByName(focusModeMenuItemId, !value)
         disableMenuByName(typewriterModeMenuItemId, !value)
+        disableMenuByName(readingModeMenuItemId, !value)
         break
       case 'typewriter':
         changeMenuByName(typewriterModeMenuItemId, value)
         break
       case 'focus':
         changeMenuByName(focusModeMenuItemId, value)
+        break
+      case 'readingMode':
+        changeMenuByName(readingModeMenuItemId, !!value)
+        // Reading Mode is incompatible with editing-oriented modes: disable
+        // them while it's on so the read-only promise can't be broken from
+        // the menu (Source Code uses a separate editor; typewriter/focus
+        // make no sense in a non-editing view).
+        disableMenuByName('sourceCodeModeMenuItem', !value)
+        disableMenuByName(typewriterModeMenuItemId, !value)
+        disableMenuByName(focusModeMenuItemId, !value)
         break
     }
   }
