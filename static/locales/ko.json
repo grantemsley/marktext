@@ -135,6 +135,7 @@
       "typewriterMode": "타자기 모드",
       "focus": "집중 모드",
       "focusMode": "집중 모드",
+      "readingMode": "읽기 모드",
       "showTabBar": "탭바 보기",
       "toc": "목차",
       "toggleTableOfContents": "목차 토글",
@@ -995,6 +996,7 @@
       "sourceCodeMode": "소스 코드 모드",
       "typewriterMode": "타자기 모드",
       "focusMode": "집중 모드",
+      "readingMode": "읽기 모드",
       "toggleSourceCodeMode": "소스 코드 모드 토글",
       "toggleTypewriterMode": "타자기 모드 토글",
       "toggleFocusMode": "집중 모드 토글",
@@ -1107,7 +1109,8 @@
       "exportSuccessTitle": "내보내기 성공",
       "exportSuccessMessage": "“{name}”을(를) 성공적으로 내보냈습니다!",
       "fileRemovedOnDisk": "“{name}”이(가) 디스크에서 삭제되었습니다.",
-      "fileChangedOnDisk": "“{name}”이(가) 디스크에서 변경되었습니다. 다시 로드하시겠습니까?"
+      "fileChangedOnDisk": "“{name}”이(가) 디스크에서 변경되었습니다. 다시 로드하시겠습니까?",
+      "fileReloadedFromDisk": "“{name}”을(를) 디스크에서 다시 로드했습니다."
     }
   },
   "spellchecker": {

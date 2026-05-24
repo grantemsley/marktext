@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch, onBeforeUnmount } from 'vue'
+import { computed } from 'vue'
 import { useEditorStore } from '@/store/editor'
 import { useLayoutStore } from '@/store/layout'
 import { storeToRefs } from 'pinia'
@@ -55,17 +55,7 @@ const currentNotification = computed(() => {
   return notifications[0]
 })
 
-let dismissTimer: ReturnType<typeof setTimeout> | null = null
-
-const clearDismissTimer = () => {
-  if (dismissTimer) {
-    clearTimeout(dismissTimer)
-    dismissTimer = null
-  }
-}
-
 const handleClick = (status: boolean) => {
-  clearDismissTimer()
   const notifications = currentFile.value?.notifications
   if (!notifications || notifications.length === 0) {
     console.error(t('editor.notifications.notificationNotFound'))
@@ -78,31 +68,6 @@ const handleClick = (status: boolean) => {
     action(status)
   }
 }
-
-// Auto-dismiss notifications that specify a `timeout`. The watcher fires on
-// every change to the current notification (including swap-to-next), so the
-// timer always tracks the visible item.
-watch(
-  currentNotification,
-  (notification) => {
-    clearDismissTimer()
-    if (notification && notification.timeout && notification.timeout > 0) {
-      const target = notification
-      dismissTimer = setTimeout(() => {
-        dismissTimer = null
-        const notifications = currentFile.value?.notifications
-        if (notifications && notifications[0] === target) {
-          notifications.shift()
-        }
-      }, notification.timeout)
-    }
-  },
-  { immediate: true }
-)
-
-onBeforeUnmount(() => {
-  clearDismissTimer()
-})
 </script>
 
 <style scoped>

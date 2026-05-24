@@ -135,6 +135,7 @@ export const viewLayoutChanged = (
         changeMenuByName('sourceCodeModeMenuItem', !!value)
         disableMenuByName(focusModeMenuItemId, !value)
         disableMenuByName(typewriterModeMenuItemId, !value)
+        disableMenuByName(readingModeMenuItemId, !value)
         break
       case 'typewriter':
         changeMenuByName(typewriterModeMenuItemId, value)
@@ -143,7 +144,14 @@ export const viewLayoutChanged = (
         changeMenuByName(focusModeMenuItemId, value)
         break
       case 'readingMode':
-        changeMenuByName(readingModeMenuItemId, value)
+        changeMenuByName(readingModeMenuItemId, !!value)
+        // Reading Mode is incompatible with editing-oriented modes: disable
+        // them while it's on so the read-only promise can't be broken from
+        // the menu (Source Code uses a separate editor; typewriter/focus
+        // make no sense in a non-editing view).
+        disableMenuByName('sourceCodeModeMenuItem', !value)
+        disableMenuByName(typewriterModeMenuItemId, !value)
+        disableMenuByName(focusModeMenuItemId, !value)
         break
     }
   }

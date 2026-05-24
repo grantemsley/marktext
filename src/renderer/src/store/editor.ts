@@ -250,7 +250,10 @@ export const useEditorStore = defineStore('editor', {
     },
 
     /**
-     * Push a tab specific notification on stack that never disappears.
+     * Push a tab-specific notification onto the stack. Persists until the user
+     * dismisses it, unless `timeout` is set (in which case it auto-dismisses
+     * and fires `action(false)` after the timeout elapses). `showConfirm`
+     * suppresses `timeout` so a confirmation prompt is never silently dropped.
      */
     pushTabNotification(data: PushTabNotificationPayload): void {
       const defaultAction: FileNotification['action'] = () => {}
@@ -268,25 +271,45 @@ export const useEditorStore = defineStore('editor', {
       }
 
       const { notifications } = tab
-
-      // Remove the old notification if only one should exist.
-      if (exclusiveType) {
-        const index = notifications.findIndex((n) => n.exclusiveType === exclusiveType)
-        if (index >= 0) {
-          // Reorder current notification
-          notifications.splice(index, 1)
-        }
-      }
-
-      // Push new notification on stack.
-      notifications.push({
+      const newNotification: FileNotification = {
         msg,
         showConfirm,
         style,
         exclusiveType,
         action,
-        timeout: data.timeout
-      })
+        // A confirmation prompt must not auto-dismiss — that would silently
+        // resolve a decision the user never made.
+        timeout: showConfirm ? undefined : data.timeout
+      }
+
+      // Replace existing same-typed notification in place so the array order
+      // is preserved (the UI shows notifications[0]; splicing+pushing could
+      // bury the replacement behind unrelated entries).
+      if (exclusiveType) {
+        const index = notifications.findIndex((n) => n.exclusiveType === exclusiveType)
+        if (index >= 0) {
+          notifications.splice(index, 1, newNotification)
+        } else {
+          notifications.push(newNotification)
+        }
+      } else {
+        notifications.push(newNotification)
+      }
+
+      // Auto-dismiss timer lives in the store so it survives tab switches.
+      // Look up the tab by id each tick — the tab list may have changed by
+      // the time the timer fires.
+      const timeout = newNotification.timeout
+      if (timeout && timeout > 0) {
+        setTimeout(() => {
+          const liveTab = this.tabs.find((t) => t.id === tabId)
+          if (!liveTab) return
+          const idx = liveTab.notifications.indexOf(newNotification)
+          if (idx < 0) return
+          liveTab.notifications.splice(idx, 1)
+          newNotification.action(false)
+        }, timeout)
+      }
     },
 
     loadChange(change: FileChangePayload): void {
@@ -1596,9 +1619,18 @@ export const useEditorStore = defineStore('editor', {
             case 'change': {
               const { autoSave, readingMode } = preferencesStore
 
-              // Reading mode: auto-reload regardless of saved state and show an
-              // auto-dismissing notification.
-              if (readingMode) {
+              // Reading mode: auto-reload and show an auto-dismissing
+              // notification. Only when the buffer has no unsaved edits —
+              // otherwise we fall through to the normal confirmation flow so
+              // the user can't silently lose work. Pending autoSave timers
+              // must be cancelled or they'd write the pre-reload buffer back
+              // to disk later.
+              if (readingMode && isSaved) {
+                if (autoSaveTimers.has(id)) {
+                  const timer = autoSaveTimers.get(id)
+                  if (timer) clearTimeout(timer)
+                  autoSaveTimers.delete(id)
+                }
                 this.loadChange(change as unknown as FileChangePayload)
                 this.pushTabNotification({
                   tabId: id,
@@ -1607,7 +1639,6 @@ export const useEditorStore = defineStore('editor', {
                   exclusiveType: 'file_changed',
                   timeout: 3000
                 })
-                debouncedSendBufferedState()
                 return
               }
 

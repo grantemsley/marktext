@@ -135,6 +135,7 @@
       "typewriterMode": "Modo Máquina de Escrever",
       "focus": "Modo Foco",
       "focusMode": "Modo Foco",
+      "readingMode": "Modo de Leitura",
       "showTabBar": "Mostrar Barra de Abas",
       "toc": "Índice",
       "toggleTableOfContents": "Alternar Índice",
@@ -995,6 +996,7 @@
       "sourceCodeMode": "Modo Código Fonte",
       "typewriterMode": "Modo Máquina de Escrever",
       "focusMode": "Modo Foco",
+      "readingMode": "Modo de Leitura",
       "toggleSourceCodeMode": "Alternar Modo Código Fonte",
       "toggleTypewriterMode": "Alternar Modo Máquina de Escrever",
       "toggleFocusMode": "Alternar Modo Foco",
@@ -1107,7 +1109,8 @@
       "exportSuccessTitle": "Exportado com sucesso",
       "exportSuccessMessage": "“{name}” foi exportado com sucesso!",
       "fileRemovedOnDisk": "“{name}” foi removido no disco.",
-      "fileChangedOnDisk": "“{name}” foi alterado no disco. Deseja recarregar?"
+      "fileChangedOnDisk": "“{name}” foi alterado no disco. Deseja recarregar?",
+      "fileReloadedFromDisk": "“{name}” foi recarregado do disco."
     }
   },
   "spellchecker": {

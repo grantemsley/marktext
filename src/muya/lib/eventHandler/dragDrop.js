@@ -33,6 +33,10 @@ class DragDrop {
     const { container, eventCenter, contentState } = this.muya
 
     const dropHandler = event => {
+      if (this.muya.isReadOnly()) {
+        event.preventDefault()
+        return
+      }
       contentState.dropHandler(event)
     }
 

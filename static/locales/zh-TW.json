@@ -135,6 +135,7 @@
       "typewriterMode": "打字機模式",
       "focus": "專注模式",
       "focusMode": "專注模式",
+      "readingMode": "閱讀模式",
       "showTabBar": "顯示標籤欄",
       "toc": "目錄",
       "toggleTableOfContents": "切換目錄",
@@ -995,6 +996,7 @@
       "sourceCodeMode": "原始碼模式",
       "typewriterMode": "打字機模式",
       "focusMode": "專注模式",
+      "readingMode": "閱讀模式",
       "toggleSourceCodeMode": "切換原始碼模式",
       "toggleTypewriterMode": "切換打字機模式",
       "toggleFocusMode": "切換專注模式",
@@ -1107,7 +1109,8 @@
       "exportSuccessTitle": "匯出成功",
       "exportSuccessMessage": "已成功匯出「{name}」！",
       "fileRemovedOnDisk": "「{name}」已在磁碟上被刪除。",
-      "fileChangedOnDisk": "「{name}」已在磁碟上發生變更。是否重新載入？"
+      "fileChangedOnDisk": "「{name}」已在磁碟上發生變更。是否重新載入？",
+      "fileReloadedFromDisk": "「{name}」已從磁碟重新載入。"
     }
   },
   "spellchecker": {

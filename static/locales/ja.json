@@ -135,6 +135,7 @@
       "typewriterMode": "タイプライターモード",
       "focus": "フォーカスモード",
       "focusMode": "フォーカスモード",
+      "readingMode": "閲覧モード",
       "showTabBar": "タブバーを表示",
       "toc": "目次",
       "toggleTableOfContents": "目次の切り替え",
@@ -995,6 +996,7 @@
       "sourceCodeMode": "ソースコードモード",
       "typewriterMode": "タイプライターモード",
       "focusMode": "フォーカスモード",
+      "readingMode": "閲覧モード",
       "toggleSourceCodeMode": "ソースコードモードを切り替え",
       "toggleTypewriterMode": "タイプライターモードを切り替え",
       "toggleFocusMode": "フォーカスモードを切り替え",
@@ -1107,7 +1109,8 @@
       "exportSuccessTitle": "エクスポートに成功",
       "exportSuccessMessage": "「{name}」を正常にエクスポートしました！",
       "fileRemovedOnDisk": "「{name}」はディスク上で削除されました。",
-      "fileChangedOnDisk": "「{name}」はディスク上で変更されました。再読み込みしますか？"
+      "fileChangedOnDisk": "「{name}」はディスク上で変更されました。再読み込みしますか？",
+      "fileReloadedFromDisk": "「{name}」をディスクから再読み込みしました。"
     }
   },
   "spellchecker": {
