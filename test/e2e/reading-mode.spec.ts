@@ -3,8 +3,8 @@ import type { ElectronApplication, Page } from 'playwright'
 import * as fs from 'node:fs'
 import { launchWithMarkdown, clickMenuById, typeIntoEditor } from './helpers'
 
-// Helper: read the editor's visible text from the DOM (works in reading mode
-// where source-code mode is disabled, so we can't fall back on CodeMirror).
+// Read the editor's visible text from the DOM. Works in reading mode where
+// source-code mode is disabled, so we can't fall back on CodeMirror.
 const readEditorText = async(page: Page): Promise<string> => {
   return await page.evaluate(() => {
     const el = document.querySelector('.editor-component') as HTMLElement | null
@@ -22,7 +22,16 @@ const isMenuItemEnabled = async(app: ElectronApplication, id: string): Promise<b
   }, id)
 }
 
-const waitForEditorToContain = (page: Page, needle: string, timeout = 5000) =>
+const enableReadingMode = async(app: ElectronApplication, page: Page): Promise<void> => {
+  await clickMenuById(app, 'readingModeMenuItem')
+  await page.waitForFunction(
+    () => !!document.querySelector('.editor-wrapper.reading'),
+    null,
+    { timeout: 5000 }
+  )
+}
+
+const waitForEditorToContain = (page: Page, needle: string, timeout = 10000) =>
   page.waitForFunction(
     (text) => {
       const el = document.querySelector('.editor-component') as HTMLElement | null
@@ -32,46 +41,31 @@ const waitForEditorToContain = (page: Page, needle: string, timeout = 5000) =>
     { timeout }
   )
 
+// Each test gets a fresh window + temp file so reading-mode state, on-disk
+// contents, and notification stacks never leak between tests. Reading mode is
+// per-window and notifications are per-tab, so a shared app would otherwise
+// carry state across cases.
 test.describe('Reading mode', () => {
   let app: ElectronApplication
   let page: Page
   let filePath: string
 
-  test.beforeAll(async() => {
+  test.beforeEach(async() => {
     const launched = await launchWithMarkdown('# Reading mode\n\nOriginal body.\n')
     app = launched.app
     page = launched.page
     filePath = launched.filePath
   })
 
-  test.afterAll(async() => {
+  test.afterEach(async() => {
     if (app) await app.close()
-  })
-
-  // Make sure each test starts from a known state: reading mode off, file
-  // contents on disk reset to the launch fixture. The "leaves no class on
-  // teardown" test at the end re-asserts this contract.
-  test.beforeEach(async() => {
-    const isReading = await page.evaluate(() =>
-      !!document.querySelector('.editor-wrapper.reading')
-    )
-    if (isReading) {
-      await clickMenuById(app, 'readingModeMenuItem')
-      await page.waitForFunction(
-        () => !document.querySelector('.editor-wrapper.reading'),
-        null,
-        { timeout: 5000 }
-      )
-    }
-    fs.writeFileSync(filePath, '# Reading mode\n\nOriginal body.\n', 'utf-8')
-    await waitForEditorToContain(page, 'Original body.')
   })
 
   test('Reading mode sets contenteditable=false on the Muya container', async() => {
     // Muya's getContainer() replaces the editor-component div in place,
-    // preserving the class but installing the `contenteditable` attribute on
-    // the container itself — so the class selector targets the muya root.
-    await clickMenuById(app, 'readingModeMenuItem')
+    // copying the class onto the new container and owning the
+    // `contenteditable` attribute — so the class selector targets the muya root.
+    await enableReadingMode(app, page)
     await page.waitForFunction(
       () => {
         const el = document.querySelector('.editor-component')
@@ -96,15 +90,10 @@ test.describe('Reading mode', () => {
     expect(await isMenuItemEnabled(app, 'focusModeMenuItem')).toBe(true)
     expect(await isMenuItemEnabled(app, 'typewriterModeMenuItem')).toBe(true)
 
-    await clickMenuById(app, 'readingModeMenuItem')
-    await page.waitForFunction(
-      () => !!document.querySelector('.editor-wrapper.reading'),
-      null,
-      { timeout: 5000 }
-    )
+    await enableReadingMode(app, page)
 
-    // Menu state propagates from renderer → main via `mt::view-layout-changed`;
-    // poll until the disable cascade has caught up rather than racing the IPC.
+    // Menu state propagates renderer → main via `mt::view-layout-changed`;
+    // poll until the disable cascade catches up rather than racing the IPC.
     await expect.poll(() => isMenuItemEnabled(app, 'sourceCodeModeMenuItem'), {
       timeout: 5000
     }).toBe(false)
@@ -118,40 +107,30 @@ test.describe('Reading mode', () => {
   })
 
   test('Reading mode reloads the buffer when the file changes on disk', async() => {
-    await clickMenuById(app, 'readingModeMenuItem')
-    await page.waitForFunction(
-      () => !!document.querySelector('.editor-wrapper.reading'),
-      null,
-      { timeout: 5000 }
-    )
+    await enableReadingMode(app, page)
 
-    fs.writeFileSync(filePath, '# Reading mode\n\nReloaded body.\n', 'utf-8')
+    fs.writeFileSync(filePath, '# Reading mode\n\nReloaded body XYZ.\n', 'utf-8')
 
     // chokidar's stability threshold (~1s) gates the change event, then the
     // renderer applies loadChange. Allow a generous window for that pipeline.
-    await waitForEditorToContain(page, 'Reloaded body.', 10000)
+    await waitForEditorToContain(page, 'Reloaded body XYZ.')
     const text = await readEditorText(page)
     expect(text).not.toContain('Original body.')
   })
 
   test('Reading mode shows an auto-dismissing notification on reload', async() => {
-    await clickMenuById(app, 'readingModeMenuItem')
-    await page.waitForFunction(
-      () => !!document.querySelector('.editor-wrapper.reading'),
-      null,
-      { timeout: 5000 }
-    )
+    await enableReadingMode(app, page)
 
     fs.writeFileSync(filePath, '# Reading mode\n\nNotified body.\n', 'utf-8')
 
     // Notification banner appears at the bottom of the editor as
-    // `.editor-notifications` (per notifications.vue).
+    // `.editor-notifications` (see notifications.vue).
     await page.waitForSelector('.editor-notifications', {
       state: 'visible',
       timeout: 10000
     })
-    // 3-second store-side timer dismisses the notification. Wait up to 6s
-    // (timer + render latency) for the element to detach.
+    // The 3s store-side timer dismisses it. Wait up to 6s (timer + render
+    // latency) for the element to detach.
     await page.waitForFunction(
       () => !document.querySelector('.editor-notifications'),
       null,
@@ -160,17 +139,11 @@ test.describe('Reading mode', () => {
   })
 
   test('Keystrokes do not mutate the buffer in reading mode', async() => {
-    await clickMenuById(app, 'readingModeMenuItem')
-    await page.waitForFunction(
-      () => !!document.querySelector('.editor-wrapper.reading'),
-      null,
-      { timeout: 5000 }
-    )
+    await enableReadingMode(app, page)
 
     const before = await readEditorText(page)
     // typeIntoEditor clicks the editor and sends keystrokes. With
-    // contenteditable=false the keystrokes should be ignored by the browser
-    // and Muya should not record any edit.
+    // contenteditable=false the browser ignores them and Muya records no edit.
     await typeIntoEditor(page, 'INJECTED-PAYLOAD-XYZ ')
     await page.waitForTimeout(300)
     const after = await readEditorText(page)
@@ -179,20 +152,13 @@ test.describe('Reading mode', () => {
   })
 
   test('Format menu actions are no-ops while in reading mode', async() => {
-    // Reading mode is the test fixture; we toggle it on AFTER seeding a
-    // selection by entering the editor first.
+    // Seed a selection on the body line while still editable, then switch to
+    // reading mode, so an unguarded format() would have a real range to act on.
     await page.click('.editor-component')
     await page.waitForTimeout(100)
 
-    await clickMenuById(app, 'readingModeMenuItem')
-    await page.waitForFunction(
-      () => !!document.querySelector('.editor-wrapper.reading'),
-      null,
-      { timeout: 5000 }
-    )
+    await enableReadingMode(app, page)
 
-    // Select the body line in the live DOM so any unguarded format() would
-    // see a real range to operate on.
     await page.evaluate(() => {
       const spans = document.querySelectorAll('.editor-component span.ag-paragraph')
       const target = Array.from(spans).find((s) =>
@@ -211,8 +177,8 @@ test.describe('Reading mode', () => {
 
     const before = await readEditorText(page)
     // `strongMenuItem` (Format > Bold) routes through `bus.emit('format', ...)`
-    // → Muya.format(); with reading mode on, the guard in Muya.format()
-    // returns before contentState is touched.
+    // → Muya.format(); the read-only guard in Muya.format() returns before
+    // contentState is touched.
     await clickMenuById(app, 'strongMenuItem')
     await page.waitForTimeout(200)
 
